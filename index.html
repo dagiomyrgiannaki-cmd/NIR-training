@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NIR SpectrAAlyzer — Εκπαιδευτική Πλατφόρμα | Biodynamics AE</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#F0F4F9;color:#1a1a2e;min-height:100vh}
+.topbar{background:#1F4E79;padding:0 24px;height:56px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo-box{width:34px;height:34px;background:#2E75B6;border-radius:8px;display:flex;align-items:center;justify-content:center;font-weight:800;color:#fff;font-size:13px}
+.tb-left{display:flex;align-items:center;gap:12px}
+.t1{color:#fff;font-size:14px;font-weight:600}
+.t2{color:#9DC3E6;font-size:11px}
+.user-chip{background:rgba(255,255,255,0.15);color:#BDD7EE;font-size:12px;padding:5px 12px;border-radius:20px;font-weight:500;display:none}
+.app{display:flex;min-height:calc(100vh - 56px)}
+.sidebar{width:236px;background:#fff;border-right:1px solid #E2E8F0;padding:16px 10px;position:sticky;top:56px;height:calc(100vh - 56px);overflow-y:auto;flex-shrink:0}
+.main{flex:1;padding:36px 48px;max-width:840px}
+.sb-label{font-size:10px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:0.8px;padding:0 8px;margin-bottom:8px;margin-top:4px}
+.sb-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;font-size:13px;color:#64748B;margin-bottom:2px;transition:all 0.15s;user-select:none}
+.sb-item:hover{background:#F1F5F9;color:#1F4E79}
+.sb-item.active{background:#EEF4FB;color:#1F4E79;font-weight:600}
+.sb-item.done{color:#276711}
+.sb-icon{width:22px;height:22px;border-radius:50%;border:1.5px solid #CBD5E1;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;flex-shrink:0;color:#94A3B8;transition:all 0.2s}
+.sb-item.active .sb-icon{border-color:#185FA5;color:#185FA5;background:#EEF4FB}
+.sb-item.done .sb-icon{border-color:#276711;background:#EAF3DE;color:#276711}
+.sb-div{height:1px;background:#E2E8F0;margin:12px 2px}
+.prog-row{display:flex;justify-content:space-between;font-size:11px;color:#94A3B8;margin-bottom:5px}
+.prog-track{background:#E2E8F0;border-radius:4px;height:5px;margin-bottom:14px}
+.prog-fill{background:#185FA5;height:5px;border-radius:4px;transition:width 0.5s}
+.page-title{font-size:22px;font-weight:700;color:#1F4E79;margin-bottom:4px}
+.page-sub{font-size:13px;color:#64748B;margin-bottom:24px;line-height:1.5}
+.card{background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:18px 20px;margin-bottom:14px}
+.card-label{font-size:10px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:10px}
+.card p{font-size:14px;color:#334155;line-height:1.7}
+.card p+p{margin-top:8px}
+.hl{background:#EEF4FB;border-left:3px solid #185FA5;padding:12px 16px;border-radius:0 8px 8px 0;margin:14px 0;font-size:13px;color:#1F4E79;line-height:1.65}
+.tw{overflow-x:auto;margin:10px 0;border-radius:10px;border:1px solid #E2E8F0}
+table{width:100%;border-collapse:collapse;font-size:13px}
+thead tr{background:#1F4E79}
+th{color:#fff;padding:9px 13px;text-align:left;font-weight:500;font-size:12px}
+td{padding:9px 13px;border-bottom:1px solid #F1F5F9;color:#334155;vertical-align:top;line-height:1.5}
+tr:last-child td{border-bottom:none}
+tr:nth-child(even) td{background:#F8FAFC}
+.nav-row{display:flex;justify-content:space-between;align-items:center;margin-top:28px;padding-top:18px;border-top:1px solid #E2E8F0}
+.btn{padding:10px 20px;border-radius:8px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid #CBD5E1;background:#fff;color:#334155;transition:all 0.15s}
+.btn:hover{background:#F8FAFC}
+.btn-p{background:#1F4E79;color:#fff;border-color:#1F4E79}
+.btn-p:hover{background:#185FA5;border-color:#185FA5}
+.btn:disabled{opacity:0.4;cursor:not-allowed}
+.qcard{background:#fff;border:1px solid #E2E8F0;border-radius:12px;padding:18px 20px;margin-bottom:12px}
+.qnum{font-size:10px;color:#94A3B8;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:7px}
+.qtext{font-size:15px;font-weight:600;color:#1F4E79;margin-bottom:14px;line-height:1.5}
+.opt{display:flex;align-items:flex-start;gap:12px;padding:10px 13px;border-radius:8px;cursor:pointer;transition:all 0.15s;border:1px solid transparent;margin-bottom:5px}
+.opt:hover:not(.lk){background:#F8FAFC;border-color:#CBD5E1}
+.opt.sl{background:#EEF4FB;border-color:#B5D4F4}
+.opt.ok{background:#EAF3DE;border-color:#C0DD97}
+.opt.bd{background:#FEF2F2;border-color:#FCA5A5}
+.opt.lk{cursor:default}
+.oc{width:20px;height:20px;border-radius:50%;border:1.5px solid #CBD5E1;flex-shrink:0;margin-top:1px;display:flex;align-items:center;justify-content:center;transition:all 0.15s}
+.opt.sl .oc{border-color:#185FA5;background:#185FA5}
+.opt.ok .oc{border-color:#276711;background:#276711}
+.opt.bd .oc{border-color:#991B1B;background:#991B1B}
+.ot{font-size:13px;color:#334155;line-height:1.5;padding-top:1px}
+.opt.ok .ot{color:#14532D;font-weight:500}
+.opt.bd .ot{color:#7F1D1D}
+.qmeta{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+.qdots{display:flex;gap:5px}
+.qdot{width:9px;height:9px;border-radius:50%;background:#E2E8F0;transition:background 0.2s}
+.qdot.a{background:#185FA5}
+.result-hero{border-radius:16px;padding:32px;text-align:center;margin-bottom:24px}
+.rh-pass{background:#EAF3DE;border:1px solid #C0DD97}
+.rh-fail{background:#FEF2F2;border:1px solid #FCA5A5}
+.score-big{font-size:64px;font-weight:800;line-height:1;margin-bottom:8px}
+.rh-pass .score-big{color:#166534}
+.rh-fail .score-big{color:#991B1B}
+.rs{font-size:20px;font-weight:700;margin-bottom:6px}
+.rh-pass .rs{color:#14532D}
+.rh-fail .rs{color:#7F1D1D}
+.rd{font-size:14px}
+.rh-pass .rd{color:#166534}
+.rh-fail .rd{color:#991B1B}
+.cert{background:#fff;border:2px solid #1F4E79;border-radius:16px;padding:36px 32px;text-align:center;margin-top:20px;position:relative;overflow:hidden}
+.cert-bar{position:absolute;top:0;left:0;right:0;height:6px;background:#1F4E79}
+.cert-ey{font-size:10px;font-weight:800;color:#185FA5;text-transform:uppercase;letter-spacing:2px;margin-bottom:14px}
+.cert-title{font-size:22px;font-weight:700;color:#1F4E79;margin-bottom:4px}
+.cert-sub{font-size:13px;color:#64748B;margin-bottom:18px}
+.cert-line{width:50px;height:2px;background:#185FA5;margin:0 auto 18px}
+.cert-to{font-size:11px;color:#94A3B8;margin-bottom:6px}
+.cert-name{font-size:28px;font-weight:700;color:#1F4E79;margin-bottom:20px;font-style:italic}
+.cmr{display:flex;justify-content:center;gap:32px;flex-wrap:wrap}
+.cml{font-size:10px;color:#94A3B8;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px}
+.cmv{font-size:15px;font-weight:700;color:#1F4E79}
+.bdg-row{display:flex;justify-content:center;gap:7px;flex-wrap:wrap;margin-top:20px}
+.bdg{display:inline-flex;align-items:center;padding:5px 12px;border-radius:20px;font-size:11px;font-weight:600}
+.bb{background:#EEF4FB;color:#0C447C;border:1px solid #B5D4F4}
+.bg{background:#EAF3DE;color:#276711;border:1px solid #C0DD97}
+.ww{max-width:540px;margin:60px auto 0;text-align:center}
+.wlogo{width:68px;height:68px;background:#1F4E79;border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;color:#fff;margin:0 auto 20px}
+.ww h1{font-size:26px;font-weight:700;color:#1F4E79;margin-bottom:6px}
+.ww p{font-size:14px;color:#64748B;margin-bottom:22px;line-height:1.6}
+.wi{width:100%;padding:13px 16px;border:1.5px solid #CBD5E1;border-radius:9px;font-size:15px;margin-bottom:18px;outline:none;transition:border 0.15s;color:#1F4E79}
+.wi:focus{border-color:#185FA5;box-shadow:0 0 0 3px #EEF4FB}
+.ig{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:22px;text-align:left}
+.it{background:#fff;border:1px solid #E2E8F0;border-radius:10px;padding:14px 16px}
+.il{font-size:10px;font-weight:700;color:#94A3B8;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:4px}
+.iv{font-size:14px;font-weight:600;color:#1F4E79}
+@media(max-width:680px){.sidebar{display:none}.main{padding:20px 16px}.ig{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<div class="topbar">
+  <div class="tb-left">
+    <div class="logo-box">NIR</div>
+    <div><div class="t1">SpectrAAlyzer Εκπαίδευση</div><div class="t2">Biodynamics AE</div></div>
+  </div>
+  <span class="user-chip" id="uchip"></span>
+</div>
+<div class="app">
+  <div class="sidebar" id="sidebar">
+    <div class="prog-row"><span>Πρόοδος</span><span id="ppct">0%</span></div>
+    <div class="prog-track"><div class="prog-fill" id="pfill" style="width:0%"></div></div>
+    <div class="sb-label">Ενότητες</div>
+    <div class="sb-item" id="n0" onclick="goTo(0)"><div class="sb-icon" id="i0">1</div>Τι είναι το NIR</div>
+    <div class="sb-item" id="n1" onclick="goTo(1)"><div class="sb-icon" id="i1">2</div>Χημειομετρία</div>
+    <div class="sb-item" id="n2" onclick="goTo(2)"><div class="sb-icon" id="i2">3</div>Πλατφόρμα Zeutec</div>
+    <div class="sb-item" id="n3" onclick="goTo(3)"><div class="sb-icon" id="i3">4</div>Αξία &amp; ROI</div>
+    <div class="sb-div"></div>
+    <div class="sb-label">Αξιολόγηση</div>
+    <div class="sb-item" id="n4" onclick="goTo(4)"><div class="sb-icon" id="i4" style="border-color:#BA7517;color:#BA7517">Q</div>Τελικό Quiz</div>
+  </div>
+  <div class="main" id="main"></div>
+</div>
+<script>
+var PASS=70,uname='',cur=-1,ans={},done=false;
+var S=[
+{t:'Ενότητα 1 — Τι είναι το NIR και πώς λειτουργεί',s:'Θεμέλια φασματοσκοπίας Εγγύς Υπερύθρου',h:'<div class="card"><div class="card-label">Το ηλεκτρομαγνητικό φάσμα</div><p>Το NIR καλύπτει την περιοχή <strong>780–2500 nm</strong>. Βρίσκεται μεταξύ ορατού φωτός και Μέσης Υπερύθρου (MIR).</p><div class="tw"><table><thead><tr><th>Περιοχή</th><th>Μήκος κύματος</th><th>Τι βλέπει</th></tr></thead><tbody><tr><td>Ορατό (VIS)</td><td>400–780 nm</td><td>Χρώμα, ηλεκτρονικές δομές</td></tr><tr><td><strong>NIR</strong></td><td><strong>780–2500 nm</strong></td><td><strong>Δεσμοί O-H, N-H, C-H</strong></td></tr><tr><td>MIR</td><td>2500–25.000 nm</td><td>Θεμελιώδεις μοριακές δονήσεις</td></tr></tbody></table></div></div><div class="card"><div class="card-label">Ποιους δεσμούς βλέπει το NIR</div><div class="tw"><table><thead><tr><th>Δεσμός</th><th>Βρίσκεται σε</th><th>Αναλύτης</th></tr></thead><tbody><tr><td>O-H</td><td>Νερό, σάκχαρα, αμυλόζη</td><td>Υγρασία</td></tr><tr><td>N-H</td><td>Πρωτεΐνες, αμίνες</td><td>Πρωτεΐνη</td></tr><tr><td>C-H</td><td>Λίπη, υδατάνθρακες</td><td>Λίπος, άμυλο, ζάχαρη</td></tr></tbody></table></div></div><div class="hl"><strong>Βασική αρχή:</strong> Το NIR ΔΕΝ μετρά απευθείας πρωτεΐνη ή λίπος. Μετρά πόσο φως απορροφάται ανά μήκος κύματος. Η μετατροπή σε ποσοστά γίνεται μέσω βαθμονόμησης.</div><div class="card"><div class="card-label">NIR vs MIR για ρουτίνα QC τροφίμων</div><div class="tw"><table><thead><tr><th>Κριτήριο</th><th>NIR</th><th>MIR</th></tr></thead><tbody><tr><td>Προετοιμασία δείγματος</td><td>Καμία — χύδην απευθείας</td><td>ATR, λεπτά φιλμ ή KBr pellets</td></tr><tr><td>Ευαισθησία στο νερό</td><td>Μέτρια — διαχειρίσιμη</td><td>Ακραία — κυριαρχεί</td></tr><tr><td>Ταχύτητα ανά δείγμα</td><td>Λιγότερο από 60 δευτερόλεπτα</td><td>Λεπτά και προετοιμασία</td></tr><tr><td>Χρήση στη γραμμή παραγωγής</td><td>Ναι</td><td>Όχι</td></tr></tbody></table></div></div><div class="card"><div class="card-label">Τρόποι μέτρησης</div><div class="tw"><table><thead><tr><th>Τρόπος</th><th>Αρχή</th><th>Εφαρμογή</th></tr></thead><tbody><tr><td>Ανακλαστικότητα NIR-R</td><td>Φως ανακλάται 1-5 mm βάθος</td><td>Κιμάς, αλεύρι, σκόνες</td></tr><tr><td>Διαπερατότητα NIT</td><td>Φως διαπερνά εντελώς</td><td>Ολόκληροι κόκκοι (GRAIN NEO)</td></tr><tr><td>Ανακλαστική Διαπερατότητα</td><td>Φως διαπερνά και ανακλάται (2x μονοπάτι)</td><td>Γάλα, γιαούρτι, υγρά</td></tr></tbody></table></div></div>'},
+{t:'Ενότητα 2 — Χημειομετρία και Βαθμονόμηση',s:'Πώς ένα φάσμα 2000 αριθμών γίνεται «Πρωτεΐνη 18,4%»',h:'<div class="card"><div class="card-label">Η αρχή βαθμονόμησης</div><p>Η βαθμονόμηση NIR είναι supervised machine learning: δείγματα γνωστής σύνθεσης (εργαστήριο αναφοράς) + φάσματα NIR = μοντέλο που χαρτογραφεί φάσμα σε σύνθεση. Η ακρίβεια εξαρτάται από ποιότητα δεδομένων αναφοράς, αντιπροσωπευτικότητα δειγμάτων και αν το νέο δείγμα εμπίπτει στον χώρο του μοντέλου.</p></div><div class="card"><div class="card-label">Αλγόριθμοι βαθμονόμησης</div><p><strong>MLR</strong> — Επιλέγει λίγα μήκη κύματος. Αποτυγχάνει σε επικαλυπτόμενα φάσματα.</p><p><strong>PLSR</strong> — Χρησιμοποιεί ολόκληρο το φάσμα. Εξάγει λανθάνουσες μεταβλητές που συσχετίζουν φάσμα και αναλύτη. Κυρίαρχη μέθοδος για τρόφιμα.</p></div><div class="card"><div class="card-label">Στατιστικά αξιολόγησης μοντέλου</div><div class="tw"><table><thead><tr><th>Μετρική</th><th>Ορισμός</th><th>Στόχος</th></tr></thead><tbody><tr><td>R²</td><td>Πόση μεταβλητότητα εξηγεί το μοντέλο</td><td>0.99 ή παραπάνω</td></tr><tr><td>RMSECV</td><td>Σφάλμα cross-validation — δείκτης overfitting</td><td>Κοντά στο RMSEC</td></tr><tr><td><strong>RMSEP</strong></td><td>Σφάλμα σε ανεξάρτητο σύνολο — χρυσό πρότυπο</td><td>Κάτω από 0.5 φορές το εύρος</td></tr><tr><td>RPD</td><td>SD/SEP — διαχωριστική ικανότητα</td><td>Πάνω από 3 για QC, 5 εξαιρετικό</td></tr></tbody></table></div></div><div class="hl"><strong>Για πωλητές:</strong> Κοιτάξτε πρώτα το RMSEP — όχι το R². Αν δεν υπάρχει RMSEP, δεν έγινε ανεξάρτητη επικύρωση. Ζητήστε εξήγηση.</div><div class="card"><div class="card-label">Προεπεξεργασία φάσματος</div><div class="tw"><table><thead><tr><th>Μέθοδος</th><th>Τι διορθώνει</th></tr></thead><tbody><tr><td>MSC</td><td>Σκέδαση λόγω μεγέθους σωματιδίων</td></tr><tr><td>SNV</td><td>Ίδιο ανά δείγμα χωρίς μέσο φάσμα αναφοράς</td></tr><tr><td>1η Παράγωγος</td><td>Σταθερή μετατόπιση γραμμής βάσης</td></tr><tr><td>Savitzky-Golay</td><td>Θόρυβος πριν από παράγωγο</td></tr></tbody></table></div></div>'},
+{t:'Ενότητα 3 — Η Πλατφόρμα Zeutec SpectrAAlyzer',s:'Σχεδιασμός οργάνου, μοντέλα και λογισμικό AWX',h:'<div class="card"><div class="card-label">Αρχή Sample/Reference (S/R)</div><p>Κάθε μέτρηση διαχωρίζει τη δέσμη <strong>ταυτόχρονα</strong> σε δείγμα και εσωτερική αναφορά. Ο λόγος ακυρώνει αυτόματα κάθε αλλαγή λαμπτήρα, θερμοκρασίας ή ανιχνευτή. Αποτέλεσμα: χωρίς σάρωση αναφοράς κάθε πρωί, ανθεκτικό σε βιομηχανικό περιβάλλον.</p></div><div class="card"><div class="card-label">Οικογένεια προϊόντων SpectrAAlyzer</div><div class="tw"><table><thead><tr><th>Μοντέλο</th><th>Κύρια μήτρα</th><th>Παράμετροι</th><th>Τεχνολογία</th></tr></thead><tbody><tr><td>MEAT</td><td>Κρέας, κιμάς, λουκάνικα</td><td>Νερό, Λίπος, Πρωτεΐνη, Κολλαγόνο, Τέφρα</td><td>NIR-R</td></tr><tr><td>FOOD</td><td>Σάλτσες, σούπες, έτοιμα γεύματα</td><td>Νερό, Λίπος, Πρωτεΐνη, Υδατάνθρακες, Αλάτι</td><td>NIR-R/Transfl.</td></tr><tr><td>DAIRY</td><td>Γάλα, τυρί, βούτυρο, ορός</td><td>Λίπος, Πρωτεΐνη, Λακτόζη, pH</td><td>Transflectance</td></tr><tr><td>FLOUR</td><td>Αλεύρι, άμυλο, σιμιγδάλι</td><td>Υγρασία, Πρωτεΐνη, Τέφρα, Γλουτένη</td><td>NIR-R</td></tr><tr><td>GRAIN NEO</td><td>Ολόκληρος κόκκος</td><td>Υγρασία, Πρωτεΐνη, Έλαιο, Άμυλο</td><td>NIT Transmittance</td></tr><tr><td>OLIVE</td><td>Ελαιόπαστα, ελαιόλαδο</td><td>Υγρασία, Έλαιο, Ελεύθερα ΛΟ</td><td>NIR-R</td></tr><tr><td>WINE</td><td>Κρασί, μούστος</td><td>Αλκοόλ, Ζάχαρη, Οξύτητα, pH</td><td>NIR/VIS</td></tr></tbody></table></div></div><div class="hl"><strong>Κανονιστικό:</strong> Το SpectrAAlyzer MEAT επικυρώνεται βάσει §64 LFGB (ASU L 06.00-64 / L 08.00-60) — το πιο αυστηρό πρότυπο στην ΕΕ για ανάλυση κρέατος. Επίσημες δηλώσεις προϊόντων, όχι μόνο εσωτερικό QC.</div><div class="card"><div class="card-label">ApplicationWorx G2 (AWX)</div><p>Ιδιοκτησιακό χημειομετρικό λογισμικό Zeutec, παρέχεται <strong>χωρίς επιπλέον κόστος</strong>. Υποστηρίζει MLR, PLSR, MSC, SNV, παράγωγα, Savitzky-Golay, πλήρη στατιστικά, MySQL, REST API για ERP/LIMS. Οι περισσότεροι ανταγωνιστές χρεώνουν ξεχωριστά το λογισμικό.</p></div>'},
+{t:'Ενότητα 4 — Αξία, ROI και Χειρισμός Αντιρρήσεων',s:'Εμπορικά επιχειρήματα και υπολογισμοί κόστους',h:'<div class="card"><div class="card-label">NIR vs μέθοδοι αναφοράς</div><div class="tw"><table><thead><tr><th>Κριτήριο</th><th>Kjeldahl</th><th>Soxhlet</th><th>NIR SpectrAAlyzer</th></tr></thead><tbody><tr><td>Χρόνος ανά δείγμα</td><td>2-3 ώρες</td><td>4-16 ώρες</td><td>Κάτω από 60 δευτερόλεπτα</td></tr><tr><td>Παράμετροι ανά εκτέλεση</td><td>1 (πρωτεΐνη)</td><td>1 (λίπος)</td><td>4-6 ταυτόχρονα</td></tr><tr><td>Κόστος ανά δείγμα</td><td>15-40 ευρώ</td><td>5-20 ευρώ</td><td>Κάτω από 0.10 ευρώ</td></tr><tr><td>Αντιδραστήρια</td><td>Επικίνδυνα (H2SO4)</td><td>Εύφλεκτα (εξάνιο)</td><td>Κανένα</td></tr><tr><td>Χρήση στη γραμμή παραγωγής</td><td>Όχι</td><td>Όχι</td><td>Ναι</td></tr></tbody></table></div></div><div class="card"><div class="card-label">TCO 5ετίας (εκτίμηση)</div><div class="tw"><table><thead><tr><th>Κόστος</th><th>Χημεία αναφοράς</th><th>NIR SpectrAAlyzer</th></tr></thead><tbody><tr><td>Κεφαλαιακή επένδυση</td><td>30.000-100.000 ευρώ</td><td>25.000-50.000 ευρώ</td></tr><tr><td>Αντιδραστήρια ανά έτος</td><td>15.000-40.000 ευρώ</td><td>500-1.500 ευρώ</td></tr><tr><td>Εργατικά ανά έτος</td><td>0.5-1.5 FTE</td><td>Λιγότερο από 0.1 FTE</td></tr><tr><td>5ετία σύνολο</td><td>200.000-350.000 ευρώ</td><td>55.000-95.000 ευρώ</td></tr></tbody></table></div></div><div class="hl"><strong>Αποπληρωμή τυπικά 12-24 μήνες.</strong> Το Rent Your Lab μετατρέπει το capex σε μηνιαίο λειτουργικό κόστος — ουδέτερο ταμειακά από τον 1ο μήνα σε εργαστήριο 50+ δειγμάτων ημερησίως.</div><div class="card"><div class="card-label">Κύριες αντιρρήσεις και απαντήσεις</div><p><strong>«Δεν είναι αρκετά ακριβές για επίσημη δήλωση»</strong><br>Η επικύρωση §64 LFGB είναι η πιο αυστηρή στην ΕΕ. Για άλλες αγορές: NIR για καθημερινό QC και Kjeldahl μία φορά την εβδομάδα για επιβεβαίωση.</p><p style="margin-top:12px"><strong>«Θα χρειαστεί νέα βαθμονόμηση για κάθε συνταγή»</strong><br>Παγκόσμιες βιβλιοθήκες για τυπικές μήτρες. Για νέες μήτρες: 80-120 δείγματα αναφοράς — εφάπαξ κόστος, αποπληρωμή σε εβδομάδες.</p><p style="margin-top:12px"><strong>«Έχουμε ήδη ζυγαριά υγρασίας»</strong><br>1 παράμετρος σε 5-15 λεπτά έναντι 5 παραμέτρων σε 60 δευτερόλεπτα. Εντελώς διαφορετικά εργαλεία.</p></div>'}
+];
+var Q=[
+{q:'Ποιο εύρος μήκους κύματος καλύπτει η περιοχή NIR;',o:['400-780 nm','780-2500 nm','2500-25000 nm','100-400 nm'],a:1},
+{q:'Ποιοι μοριακοί δεσμοί απορροφούν κυρίως στο NIR σε τρόφιμα;',o:['C-C και C=C','Na-Cl και Mg-O','O-H, N-H και C-H','P-O και S=O'],a:2},
+{q:'Τι αντιπροσωπεύει το RMSEP;',o:['Σφάλμα στο σύνολο εκπαίδευσης μόνο','Σφάλμα cross-validation','Σφάλμα σε πλήρως ανεξάρτητο σύνολο — χρυσό πρότυπο','Αριθμός PLS παραγόντων'],a:2},
+{q:'Ποια είναι η λειτουργία της αρχής Sample/Reference (S/R);',o:['Μετρά δύο δείγματα ταυτόχρονα','Διαχωρίζει δέσμη σε σήμα δείγματος και αναφοράς — ακυρώνει παρεκκλίσεις οργάνου','Απαιτεί εξωτερικό πρότυπο κάθε πρωί','Χρησιμοποιεί δύο λαμπτήρες'],a:1},
+{q:'Ποιο μοντέλο SpectrAAlyzer χρησιμοποιεί NIT Transmittance για ολόκληρους κόκκους;',o:['SpectrAAlyzer MEAT','SpectrAAlyzer DAIRY','SpectrAAlyzer GRAIN NEO','SpectrAAlyzer FLOUR'],a:2},
+{q:'Τι σημαίνει RPD πάνω από 5 σε μοντέλο NIR;',o:['Σοβαρό overfitting','Κατάλληλο μόνο για screening','Εξαιρετική ποιότητα — ακριβής ποσοτική ανάλυση','Συστηματική προκατάληψη bias'],a:2},
+{q:'Βάσει ποιου κανονισμού επικυρώνεται το SpectrAAlyzer MEAT για επίσημο έλεγχο;',o:['ISO 22000:2018','EU Regulation 1169/2011','§64 LFGB (ASU L 06.00-64 / L 08.00-60)','BRC Global Standard Issue 9'],a:2},
+{q:'Γιατί το NIR δεν ανιχνεύει μόνο του νοθεία με μελαμίνη;',o:['Η μελαμίνη δεν υπάρχει στα τρόφιμα','Η μελαμίνη περιέχει 67% N — ανιχνεύεται ως πρωτεΐνη όπως στο Kjeldahl','Το NIR δεν μετρά καθόλου άζωτο','Απορροφά μόνο στο UV'],a:1},
+{q:'Ποιο είναι το κύριο πλεονέκτημα NIR έναντι Kjeldahl για ρουτίνα QC;',o:['Μεγαλύτερη ακρίβεια στη μέτρηση αζώτου','4-6 παράμετροι σε λιγότερο από 60 δευτερόλεπτα, λιγότερο από 0.10 ευρώ/δείγμα, χωρίς αντιδραστήρια','Χαμηλότερο κόστος αγοράς οργάνου','Δεν απαιτεί βαθμονόμηση'],a:1},
+{q:'Τι είναι ένας φασματικός εκτός-ορίων (spectral outlier);',o:['Δείγμα με υψηλή περιεκτικότητα λίπους','Φάσμα που διαφέρει στατιστικά από τα δείγματα εκπαίδευσης — εκτός χώρου βαθμονόμησης','Σφάλμα τοποθέτησης δείγματος','Αποτέλεσμα εκτός ορίων EU'],a:1}
+];
+function welcome(){
+  document.getElementById('main').innerHTML='<div class="ww"><div class="wlogo">NIR</div><h1>Καλώς ήρθατε</h1><p>Εκπαίδευση NIR SpectrAAlyzer &mdash; Biodynamics AE<br>Εισάγετε το ονοματεπώνυμό σας για να ξεκινήσετε</p><input class="wi" id="ni" type="text" placeholder="Ονοματεπώνυμο" maxlength="60"/><div class="ig"><div class="it"><div class="il">Ενότητες</div><div class="iv">4 θεματικές ενότητες</div></div><div class="it"><div class="il">Τελικό Quiz</div><div class="iv">10 ερωτήσεις</div></div><div class="it"><div class="il">Όριο επιτυχίας</div><div class="iv">70% (7 στις 10)</div></div><div class="it"><div class="il">Εκτιμώμενος χρόνος</div><div class="iv">30–45 λεπτά</div></div></div><button class="btn btn-p" style="width:100%;padding:13px 20px;font-size:15px" onclick="start()">Έναρξη Εκπαίδευσης &rarr;</button></div>';
+  document.getElementById('ni').addEventListener('keypress',function(e){if(e.key==='Enter')start();});
+}
+function start(){
+  var v=document.getElementById('ni').value.trim();
+  if(!v){document.getElementById('ni').style.borderColor='#E24B4A';return;}
+  uname=v;
+  var c=document.getElementById('uchip');c.textContent=uname;c.style.display='inline';
+  goTo(0);
+}
+function goTo(n){
+  cur=n;updateSB();updateProg();
+  if(n<4)renderS(n);else renderQ();
+  window.scrollTo(0,0);
+}
+function updateSB(){
+  for(var i=0;i<=4;i++){
+    var el=document.getElementById('n'+i),ic=document.getElementById('i'+i);
+    if(!el)continue;
+    el.className='sb-item';
+    if(i===cur)el.className='sb-item active';
+    else if(i<cur&&i<4){el.className='sb-item done';if(ic)ic.textContent='✓';}
+  }
+}
+function updateProg(){
+  var pct=cur<0?0:cur>=4?100:Math.round(((cur+1)/5)*100);
+  document.getElementById('pfill').style.width=pct+'%';
+  document.getElementById('ppct').textContent=pct+'%';
+}
+function renderS(n){
+  var s=S[n],last=n===3;
+  document.getElementById('main').innerHTML='<div class="page-title">'+s.t+'</div><div class="page-sub">'+s.s+'</div>'+s.h+'<div class="nav-row">'+(n>0?'<button class="btn" onclick="goTo('+(n-1)+')">&#8592; Προηγούμενο</button>':'<span></span>')+(last?'<button class="btn btn-p" onclick="goTo(4)">Πάω στο Quiz &#8594;</button>':'<button class="btn btn-p" onclick="goTo('+(n+1)+')">Επόμενο &#8594;</button>')+'</div>';
+}
+function renderQ(){
+  if(done){renderR();return;}
+  var answered=Object.keys(ans).length;
+  var dots=Q.map(function(_,i){return '<div class="qdot'+(ans[i]!==undefined?' a':'')+'"></div>';}).join('');
+  var h='<div class="page-title">Τελικό Quiz Αξιολόγησης</div><div class="page-sub">Απαντήστε όλες τις ερωτήσεις &mdash; απαιτείται '+PASS+'% για πιστοποιητικό</div><div class="qmeta"><span style="font-size:13px;color:#64748B">'+answered+'/'+Q.length+' απαντημένες</span><div class="qdots">'+dots+'</div></div>';
+  Q.forEach(function(q,qi){
+    h+='<div class="qcard"><div class="qnum">Ερώτηση '+(qi+1)+' από '+Q.length+'</div><div class="qtext">'+q.q+'</div>';
+    q.o.forEach(function(opt,oi){
+      var s2=ans[qi]===oi?'sl':'';
+      h+='<div class="opt '+s2+'" onclick="pick('+qi+','+oi+')"><div class="oc"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="ot">'+opt+'</span></div>';
+    });
+    h+='</div>';
+  });
+  h+='<div class="nav-row"><button class="btn" onclick="goTo(3)">&#8592; Πίσω στο υλικό</button><button class="btn btn-p" id="sbtn" onclick="sub()" '+(answered<Q.length?'disabled':'')+'>'+(answered<Q.length?'Υποβολή ('+answered+'/'+Q.length+' απαντημένες)':'Υποβολή Quiz')+'</button></div>';
+  document.getElementById('main').innerHTML=h;
+}
+function pick(qi,oi){if(done)return;ans[qi]=oi;renderQ();}
+function sub(){if(Object.keys(ans).length<Q.length)return;done=true;renderR();}
+function renderR(){
+  var correct=0;
+  Q.forEach(function(q,qi){if(ans[qi]===q.a)correct++;});
+  var pct=Math.round((correct/Q.length)*100),pass=pct>=PASS;
+  var months=['Ιανουαρίου','Φεβρουαρίου','Μαρτίου','Απριλίου','Μαΐου','Ιουνίου','Ιουλίου','Αυγούστου','Σεπτεμβρίου','Οκτωβρίου','Νοεμβρίου','Δεκεμβρίου'];
+  var d=new Date();var today=d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear();
+  var h='<div class="page-title">Αποτελέσματα</div><div class="page-sub">NIR SpectrAAlyzer Εκπαίδευση &mdash; Biodynamics AE</div>';
+  h+='<div class="result-hero '+(pass?'rh-pass':'rh-fail')+'"><div class="score-big">'+pct+'%</div><div class="rs">'+(pass?'Επιτυχία!':'Δεν πέρασε')+'</div><div class="rd">'+correct+'/'+Q.length+' σωστές &mdash; '+(pass?'Ξεπεράσατε το όριο '+PASS+'%':'Απαιτείται '+PASS+'% — δοκιμάστε ξανά')+'</div></div>';
+  if(pass){
+    h+='<div class="cert"><div class="cert-bar"></div><div class="cert-ey">Πιστοποιητικό Ολοκλήρωσης</div><div class="cert-title">NIR Φασματοσκοπία για Ανάλυση Τροφίμων</div><div class="cert-sub">Zeutec SpectrAAlyzer &mdash; Biodynamics AE</div><div class="cert-line"></div><div class="cert-to">Αποδίδεται σε</div><div class="cert-name">'+uname+'</div><div class="cmr"><div><div class="cml">Βαθμός</div><div class="cmv">'+pct+'%</div></div><div><div class="cml">Σωστές</div><div class="cmv">'+correct+'/'+Q.length+'</div></div><div><div class="cml">Ημερομηνία</div><div class="cmv">'+today+'</div></div></div><div class="bdg-row"><span class="bdg bb">NIR Fundamentals</span><span class="bdg bb">Chemometrics</span><span class="bdg bb">SpectrAAlyzer Platform</span><span class="bdg bg">ROI Analysis</span><span class="bdg bg">Sales Argumentation</span></div></div>';
+  }
+  h+='<div style="margin-top:28px"><div class="page-sub" style="margin-bottom:14px">Αναλυτικά αποτελέσματα</div>';
+  Q.forEach(function(q,qi){
+    var ok=ans[qi]===q.a;
+    h+='<div class="qcard"><div class="qnum" style="color:'+(ok?'#276711':'#991B1B')+';font-weight:700">'+(ok?'✓ Σωστό':'✗ Λάθος')+'</div><div class="qtext">'+q.q+'</div>';
+    q.o.forEach(function(opt,oi){
+      var c='lk';
+      if(oi===q.a)c+=' ok';
+      else if(oi===ans[qi]&&!ok)c+=' bd';
+      h+='<div class="opt '+c+'"><div class="oc"><svg width="10" height="8" viewBox="0 0 10 8" fill="none"><path d="M1 4L3.5 6.5L9 1" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="ot">'+opt+'</span></div>';
+    });
+    h+='</div>';
+  });
+  if(pass){
+    h+='<div style="background:#EEF4FB;border:1px solid #B5D4F4;border-radius:12px;padding:20px 24px;margin-top:20px;text-align:center">';
+    h+='<div style="font-size:15px;font-weight:600;color:#1F4E79;margin-bottom:6px">Αποστολή αποτελέσματος στον υπεύθυνο</div>';
+    h+='<div style="font-size:13px;color:#64748B;margin-bottom:16px">Πάτα το κουμπί για να στείλεις το αποτέλεσμά σου με email</div>';
+    h+='<button class="btn btn-p" style="padding:12px 28px;font-size:14px" onclick="sendEmail(\''+uname+'\','+pct+','+correct+')">Αποστολή αποτελέσματος &#9993;</button>';
+    h+='</div>';
+  }
+  h+='<div class="nav-row"><button class="btn" onclick="reset()">Επανάληψη Quiz</button>'+(pass?'<span></span>':'<button class="btn btn-p" onclick="goTo(0)">Επανέλεγχος υλικού</button>')+'</div>';
+  document.getElementById('main').innerHTML=h;
+}
+function sendEmail(name,pct,correct){
+  var to='d.agiomyrgiannaki@biodynamics.gr';
+  var subject='NIR Quiz - Αποτέλεσμα: '+name+' ('+pct+'%)';
+  var body='Αποτέλεσμα Quiz NIR SpectrAAlyzer\n\n';
+  body+='Ονοματεπώνυμο: '+name+'\n';
+  body+='Βαθμός: '+pct+'%\n';
+  body+='Σωστές απαντήσεις: '+correct+'/10\n';
+  body+='Αποτέλεσμα: ΕΠΙΤΥΧΙΑ (70% ή παραπάνω)\n';
+  var months=['Ιανουαρίου','Φεβρουαρίου','Μαρτίου','Απριλίου','Μαΐου','Ιουνίου','Ιουλίου','Αυγούστου','Σεπτεμβρίου','Οκτωβρίου','Νοεμβρίου','Δεκεμβρίου'];
+  var d=new Date();
+  body+='Ημερομηνία: '+d.getDate()+' '+months[d.getMonth()]+' '+d.getFullYear()+'\n\n';
+  body+='--- Αποστολή από την πλατφόρμα NIR Εκπαίδευσης Biodynamics AE ---';
+  window.location.href='mailto:'+to+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+}
+function reset(){ans={};done=false;renderQ();}
+welcome();
+</script>
+</body>
+</html>
